@@ -11,31 +11,55 @@ format:
 execute: 
   echo: true
 ---
+#1. Use the help(?) function to learn more about the dataset.
 ```{r}
-#1. Use the help(?) function to learn more about the dataset. 
+?airquality
 ```
 
-```{r}
 #2. Use vis_dat to check out the data. Does it need cleaning?
-```
-Yes. 
+Yes.
 ```{r}
-#3. Fit a linear model to the cleaned data to predict Ozone from one of the possible predictors of your choosing. Why did you chose that variable? 
+library(visdat)
+vis_dat(airquality)
 ```
+
+#3. Fit a linear model to the cleaned data to predict Ozone from one of the possible predictors of your choosing. Why did you chose that variable?
 Temperature affects air quality due to its role in chemical reactions in the atmosphere.
 ```{r}
-#4. Using summary(),  does this seem like a valid model? 
+airquality_clean <- na.omit(airquality)
+model <- lm(Ozone ~ Temp, data = airquality_clean)
+ (cor(airquality_clean$Ozone, airquality_clean$Temp)
+)
 ```
+
+#4. Using summary(),  does this seem like a valid model? 
 Yes. 
 ```{r}
-#5. Explain the R^2 found in a sentance. 
+summary(model)
 ```
+
+#5. Explain the R^2 found in a sentance.
 The model explains 0.49% of the variability in Ozone levels using Temperature as a predictor.
 ```{r}
-#6. Use broom:augment to predict the Ozone of the cleaned data. 
+summary(model)$r.squared
 ```
 
+#6. Use broom:augment to predict the Ozone of the cleaned data.
 ```{r}
-#7. Use ggplot2 to plot the actual vs. predicted Ozone. 
+library(broom)
+a <- augment(model)
 ```
 
+#7. Use ggplot2 to plot the actual vs. predicted Ozone. 
+```{r}
+library(ggplot2)
+ggplot(a, aes(x = .fitted, y = Ozone)) +
+     geom_point() +
+     geom_abline(intercept = 0, slope = 1, color = "red") +
+     labs(
+         title = "Actual vs Predicted Ozone Levels",
+         x = "Predicted Ozone",
+         y = "Actual Ozone",
+         subtitle = paste("Correlation:", round(cor(a$Ozone, a$.fitted), 2))
+     )
+```
